@@ -14,6 +14,7 @@ const Share = () => {
   const [normalMoney, setNormalMoney] = useState(0);
   const [isEditingNormalMoney, setIsEditingNormalMoney] = useState(false);
   const [normalMoneyInput, setNormalMoneyInput] = useState(normalMoney);
+  const [manualMoney, setManualMoney] = useState(0);
 
   const [data, setData] = useState<PersonType[]>([]);
   const [currentName, setCurrentName] = useState("");
@@ -28,45 +29,50 @@ const Share = () => {
   const [isScoreInputVisible, setIsScoreInputVisible] = useState(false);
   const scoreInputVisibleRef = useRef<HTMLInputElement | null>(null);
 
+  const [editingEstimateIndex, setEditingEstimateIndex] = useState<number | null>(null);
+  const [editedEstimate, setEditedEstimate] = useState<number>(0);
+
   const inputRef = useRef<HTMLInputElement | null>(null);
   const scoreInputRef = useRef<HTMLInputElement | null>(null);
+  const estimateInputRef = useRef<HTMLInputElement | null>(null);
 
   const numberToDot = (num: number): string => {
     return new Intl.NumberFormat("en-US").format(Math.floor(num));
   };
 
   const handleNormalMoneyClick = () => {
-  setNormalMoneyInput(normalMoney);
-  setIsEditingNormalMoney(true);
-};
-
-const handleNormalMoneyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  setNormalMoneyInput(Number(e.target.value));
-};
-
-const saveNormalMoney = () => {
-  if (!normalMoneyInput || normalMoneyInput < 0) {
     setNormalMoneyInput(normalMoney);
-  } else {
-    setNormalMoney(normalMoneyInput);
-  }
-  setIsEditingNormalMoney(false);
+    setIsEditingNormalMoney(true);
+  };
+
+  const handleNormalMoneyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  setNormalMoneyInput(Number(e.target.value)); // Update normalMoneyInput
 };
 
-const handleNormalMoneyKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-  if (e.key === "Enter") {
-    saveNormalMoney();
-  } else if (e.key === "Escape") {
+
+  const saveNormalMoney = () => {
+    if (normalMoneyInput < 0 || normalMoneyInput > initialMoney) {
+      setNormalMoneyInput(normalMoney);  // Revert if out of bounds
+    } else {
+      setNormalMoney(normalMoneyInput);  // Update the state with new value
+    }
     setIsEditingNormalMoney(false);
-    setNormalMoneyInput(normalMoney);
-  }
-};
+  };
 
-const onScoreInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-  if (e.key === "Enter") {
-    addHandlerButton();
-  }
-};
+  const handleNormalMoneyKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      saveNormalMoney();
+    } else if (e.key === "Escape") {
+      setIsEditingNormalMoney(false);
+      setNormalMoneyInput(normalMoney);
+    }
+  };
+
+  const onScoreInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      addHandlerButton();
+    }
+  };
 
   const handleInitMoneyClick = () => {
     setInitialMoneyInput(initialMoney);
@@ -74,25 +80,26 @@ const onScoreInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
   };
 
   const handleInitialMoneyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInitialMoneyInput(Number(e.target.value));
+    setInitialMoneyInput(Number(e.target.value)); // This should update `initialMoneyInput`, not `initialMoney`
   };
 
   const saveInitialMoney = () => {
     if (!initialMoneyInput || initialMoneyInput <= 0) {
-      setInitialMoneyInput(initialMoney);
+      setInitialMoneyInput(initialMoney);  // If invalid input, revert to original
     } else {
-      setInitialMoney(initialMoneyInput);
+      setInitialMoney(initialMoneyInput);  // Save the edited value to the `initialMoney` state
 
       const newTotalScore = data.reduce((acc, p) => acc + p.score, 0);
       const updatedData = data.map((person) => ({
         ...person,
-        estimate: (person.score / newTotalScore) * initialMoneyInput,
+        estimate: (person.score / newTotalScore) * initialMoneyInput, // Recalculate estimates
       }));
 
-      setData(updatedData);
+      setData(updatedData);  // Update the data with the recalculated estimates
     }
-    setIsEditingInitialMoney(false);
+    setIsEditingInitialMoney(false);  // Exit editing mode
   };
+
 
   const handleInitialMoneyKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
@@ -104,21 +111,22 @@ const onScoreInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
   };
 
   const updateTotalScoreAndEstimates = (newData: PersonType[]) => {
-    // Calculate the total score for "✅" and "❌" categories separately
-    const totalScoreChecked = newData
-      .filter((person) => person.category === "✅")
-      .reduce((acc, person) => acc + person.score, 0);
-
-    const totalScoreUnchecked = newData
-      .filter((person) => person.category === "❌")
-      .reduce((acc, person) => acc + person.score, 0);
-
     // Update estimates based on categories
     const updatedData = newData.map((person) => {
-      const estimate =
-        person.category === "✅"
-          ? (person.score / totalScoreChecked) * (initialMoney - normalMoney) // Estimate for ✅
-          : (person.score / totalScoreUnchecked) * normalMoney; // Estimate for ❌
+      let estimate = person.estimate;
+
+      if (person.estimate === 0 && editingEstimateIndex !== null) {
+        // If it's being manually edited, use the input value
+        estimate = editedEstimate;
+      } else {
+        // Calculate the estimate based on categories
+        estimate =
+          person.category === "🟢"
+            ? (person.score / newData.filter(p => p.category === "🟢").reduce((acc, p) => acc + p.score, 0)) * (initialMoney - normalMoney - manualMoney)
+            : person.category === "🔴"
+            ? (person.score / newData.filter(p => p.category === "🔴").reduce((acc, p) => acc + p.score, 0)) * normalMoney
+            : person.estimate; // Default estimate remains unchanged
+      }
 
       return {
         ...person,
@@ -126,10 +134,8 @@ const onScoreInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
       };
     });
 
-    // Set the updated data
     setData(updatedData);
   };
-
 
   const addHandlerButton = () => {
     if (!currentName.trim() || nameSet.has(currentName)) return;
@@ -137,7 +143,7 @@ const onScoreInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
 
     const newPerson: PersonType = {
       name: currentName,
-      category: "✅",
+      category: "🟢",
       score: currentScore > 10000 ? 10000 : currentScore,
       estimate: 0,
     };
@@ -181,7 +187,14 @@ const onScoreInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
 
   const setCategory = (index: number): void => {
     const updatedData = [...data];
-    updatedData[index].category = updatedData[index].category === "✅" ? "❌" : "✅";
+    if (updatedData[index].category === "🟢") {
+      updatedData[index].category = "🔴";
+    } else if (updatedData[index].category === "🔴") {
+      updatedData[index].category = "🟢";
+    } else {
+      updatedData[index].category = "🟢";
+      setManualMoney(manualMoney - updatedData[index].estimate);
+    }
     updateTotalScoreAndEstimates(updatedData);
   };
 
@@ -211,9 +224,59 @@ const onScoreInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     }
   }, [editingScoreIndex]);
 
+  useEffect(() => {
+    if (editingEstimateIndex !== null && estimateInputRef.current) {
+      estimateInputRef.current.focus();
+    }
+  }, [editingEstimateIndex]);
+
+  useEffect(() => {
+    // Recalculate estimates after initial, normal, or manual money change
+    updateTotalScoreAndEstimates(data);
+  }, [initialMoney, normalMoney, manualMoney]);
+
+  const saveEstimateEdit = (index: number): void => {
+    const updatedData = [...data];
+
+    // Ensure valid estimate input
+    const validEstimate = isNaN(editedEstimate) || editedEstimate <= 0 ? 0 : editedEstimate;
+
+    // Save the initial value
+    let lastEstimate = 0;
+
+    if (updatedData[index].category === "🟡") {
+      lastEstimate = updatedData[index].estimate;
+    }
+
+    // Manually update the person's estimate
+    updatedData[index].estimate = validEstimate;
+
+    // Reset the score to 0 when editing the estimate
+    updatedData[index].score = 0;
+
+    // Change the category to neutral (🟡) when manually editing estimate
+    updatedData[index].category = "🟡"; // Neutral category
+
+    // Update manual money, ensuring it doesn't exceed the initial money
+    const newManualMoney = manualMoney + validEstimate - lastEstimate;
+    if (newManualMoney <= initialMoney) {
+      setManualMoney(newManualMoney);
+    } else {
+      setManualMoney(manualMoney); // Don't allow manual money to exceed initial money
+    }
+
+    setEditingEstimateIndex(null);
+    updateTotalScoreAndEstimates(updatedData);
+  };
+
+  const startEditingEstimate = (index: number, estimate: number): void => {
+    setEditingEstimateIndex(index);
+    setEditedEstimate(estimate);
+  };
+
   return (
     <div className="flex justify-center items-center flex-col p-20 mx-auto bg-black">
-      <div className="flex justify-center items-center flex-col bg-[#1d1d1d] p-5 w-2/3 rounded-xl py-13">
+      <div className="flex justify-center items-center flex-col bg-[#1d1d1d] p-5 w-[1300px] rounded-xl py-13">
       {isEditingInitialMoney ? (
         <input
           type="number"
@@ -236,8 +299,8 @@ const onScoreInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
         </button>
       )}
       
-      <div className="flex flex-row justify-between items-center align-middle gap-100 my-10">
-        <p className="font-semibold">{numberToDot(initialMoney - normalMoney)}</p>
+      <div className="flex flex-row justify-around items-center align-middle gap-75 my-10">
+        <p className="font-semibold">{numberToDot(initialMoney - normalMoney - manualMoney)}</p>
 
         {isEditingNormalMoney ? (
           <input
@@ -260,6 +323,8 @@ const onScoreInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
             {numberToDot(normalMoney)}
           </button>
         )}
+
+        <p className="">{numberToDot(manualMoney)}</p>
       </div>
 
       <div className="flex flex-col gap-3 mb-5">
@@ -398,7 +463,7 @@ const onScoreInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
                     onClick={() => setCategory(index)}
                     className="text-sm px-2 py-1 rounded"
                   >
-                    {person.category === "✅" ? "✅" : "❌"}
+                    {person.category}
                   </button>
                 </td>
                 <td>
@@ -430,7 +495,35 @@ const onScoreInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
                     </button>
                   )}
                 </td>
-                <td>{numberToDot(person.estimate)}</td>
+                <td>
+                  {editingEstimateIndex === index ? (
+                      <div className="flex gap-2">
+                        <input
+                          ref={estimateInputRef}
+                          type="number"
+                          className="border px-2 py-1 w-20"
+                          value={editedEstimate === 0 ? "" : editedEstimate}
+                          onChange={(e) => setEditedEstimate(Number(e.target.value))}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") saveEstimateEdit(index);
+                          }}
+                        />
+                        <button
+                          onClick={() => saveEstimateEdit(index)}
+                          className="bg-black text-white px-2 rounded"
+                        >
+                          Save
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => startEditingEstimate(index, person.estimate)}
+                        className="hover:text-red-800 hover:scale-105"
+                      >
+                        {numberToDot(person.estimate)}
+                      </button>
+                    )}
+                </td>
               </tr>
             ))}
           </tbody>
