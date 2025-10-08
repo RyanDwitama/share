@@ -80,7 +80,7 @@ const Share = () => {
   };
 
   const handleInitialMoneyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInitialMoneyInput(Number(e.target.value)); // This should update `initialMoneyInput`, not `initialMoney`
+    setInitialMoneyInput(Number(e.target.value)); // This should update `initialMoneyInput`, not `initialMone`
   };
 
   const saveInitialMoney = () => {
