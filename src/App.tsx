@@ -88,14 +88,6 @@ const Share = () => {
       setInitialMoneyInput(initialMoney);  // If invalid input, revert to original
     } else {
       setInitialMoney(initialMoneyInput);  // Save the edited value to the `initialMoney` state
-
-      const newTotalScore = data.reduce((acc, p) => acc + p.score, 0);
-      const updatedData = data.map((person) => ({
-        ...person,
-        estimate: (person.score / newTotalScore) * initialMoneyInput, // Recalculate estimates
-      }));
-
-      setData(updatedData);  // Update the data with the recalculated estimates
     }
     setIsEditingInitialMoney(false);  // Exit editing mode
   };
@@ -113,10 +105,10 @@ const Share = () => {
     // Update estimates based on categories
     const updatedData = newData.map((person) => {
       let estimate = person.estimate;
-
+      
       if (person.estimate === 0 && editingEstimateIndex !== null) {
         // If it's being manually edited, use the input value
-        estimate = editedEstimate;
+        estimate = estimate;
       } else {
         // Calculate the estimate based on categories
         estimate =
@@ -138,11 +130,10 @@ const Share = () => {
 
   const addHandlerButton = () => {
     if (!currentName.trim() || nameSet.has(currentName)) return;
-    if (!currentScore) return;
 
     const newPerson: PersonType = {
       name: currentName,
-      category: "🟢",
+      category: currentScore === 0 ? "🟡" : "🟢",
       score: currentScore > 10000 ? 10000 : currentScore,
       estimate: 0,
     };
@@ -199,6 +190,8 @@ const Share = () => {
   };
 
   const startEditingScore = (index: number, score: number): void => {
+    if (data[index].category === "🟡") return;
+
     setEditingScoreIndex(index);
     setEditedScore(score);
   };
