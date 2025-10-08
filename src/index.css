@@ -1,0 +1,33 @@
+@import "tailwindcss";
+
+td, th {
+    border: 2px solid rgb(160, 160, 160);
+    text-align: left;
+    padding: 8px;
+    text-align: center;
+}
+
+tr:nth-child(even) {
+    background-color: #1a1a1a;
+}
+tr:nth-child(odd) {
+    background-color: #2d2d2d;
+}
+
+
+/* For Chrome, Safari, Edge, Opera */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* For Firefox */
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+body {
+  background-color: black;
+  color: rgb(189, 189, 189);
+}
