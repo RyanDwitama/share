@@ -40,6 +40,17 @@ const Share = () => {
     return new Intl.NumberFormat("en-US").format(Math.floor(num));
   };
 
+  const deletePersonData = (index: number) => {
+    const personToDelete = data[index];
+    const updatedData = data.filter((_, i) => i !== index);
+
+    if (personToDelete.category === "🟡") {
+      setManualMoney(prev => prev - personToDelete.estimate);
+    }
+
+    updateTotalScoreAndEstimates(updatedData); // This sets the new data and recalculates
+  };
+
   const handleNormalMoneyClick = () => {
     setNormalMoneyInput(normalMoney);
     setIsEditingNormalMoney(true);
@@ -102,21 +113,19 @@ const Share = () => {
   };
 
   const updateTotalScoreAndEstimates = (newData: PersonType[]) => {
-    // Update estimates based on categories
-    const updatedData = newData.map((person) => {
+    const greenData = newData.filter(p => p.category === "🟢");
+    const redData = newData.filter(p => p.category === "🔴");
+
+    const greenTotal = greenData.reduce((sum, p) => sum + p.score, 0);
+    const redTotal = redData.reduce((sum, p) => sum + p.score, 0);
+
+    const updatedData = newData.map(person => {
       let estimate = person.estimate;
-      
-      if (person.estimate === 0 && editingEstimateIndex !== null) {
-        // If it's being manually edited, use the input value
-        estimate = estimate;
-      } else {
-        // Calculate the estimate based on categories
-        estimate =
-          person.category === "🟢"
-            ? (person.score / newData.filter(p => p.category === "🟢").reduce((acc, p) => acc + p.score, 0)) * (initialMoney - normalMoney - manualMoney)
-            : person.category === "🔴"
-            ? (person.score / newData.filter(p => p.category === "🔴").reduce((acc, p) => acc + p.score, 0)) * normalMoney
-            : person.estimate; // Default estimate remains unchanged
+
+      if (person.category === "🟢" && greenTotal > 0) {
+        estimate = (person.score / greenTotal) * (initialMoney - normalMoney - manualMoney);
+      } else if (person.category === "🔴" && redTotal > 0) {
+        estimate = (person.score / redTotal) * normalMoney;
       }
 
       return {
@@ -125,7 +134,7 @@ const Share = () => {
       };
     });
 
-    setData(updatedData);
+    setData(updatedData); // ✅ single place we set the state
   };
 
   const addHandlerButton = () => {
@@ -174,7 +183,7 @@ const Share = () => {
     setEditingIndex(null);
     setEditedName("");
   };
-
+  
   const setCategory = (index: number): void => {
     const updatedData = [...data];
     if (updatedData[index].category === "🟢") {
@@ -227,6 +236,8 @@ const Share = () => {
     // Recalculate estimates after initial, normal, or manual money change
     updateTotalScoreAndEstimates(data);
   }, [initialMoney, normalMoney, manualMoney]);
+
+  
 
   const saveEstimateEdit = (index: number): void => {
     const updatedData = [...data];
@@ -404,7 +415,14 @@ const Share = () => {
           <tbody>
             {data.map((person, index) => (
               <tr key={index} className="border-t">
-                <td>{index + 1}</td>
+                <td>
+                  <button 
+                    className="w-full hover:bg-red-900 p-2"
+                    onClick={() => deletePersonData(index)}
+                  >
+                      {index + 1}
+                  </button>
+                </td>
                 
                 <td>
                   {editingIndex === index ? (
@@ -454,7 +472,7 @@ const Share = () => {
                 <td>
                   <button
                     onClick={() => setCategory(index)}
-                    className="text-sm px-2 py-1 rounded"
+                    className="text-sm px-2 py-1 rounded text-xl"
                   >
                     {person.category}
                   </button>
