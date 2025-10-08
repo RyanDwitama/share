@@ -100,7 +100,6 @@ const Share = () => {
     setIsEditingInitialMoney(false);  // Exit editing mode
   };
 
-
   const handleInitialMoneyKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       saveInitialMoney();
@@ -193,6 +192,7 @@ const Share = () => {
       updatedData[index].category = "🟢";
     } else {
       updatedData[index].category = "🟢";
+      updatedData[index].score = 1;
       setManualMoney(manualMoney - updatedData[index].estimate);
     }
     updateTotalScoreAndEstimates(updatedData);
@@ -291,7 +291,7 @@ const Share = () => {
         />
       ) : (
         <button
-          className="font-extrabold"
+          className="font-extrabold bg-black p-5 py-3 border rounded-xl"
           onClick={handleInitMoneyClick}
           title="Click to edit initial money"
         >
@@ -299,8 +299,8 @@ const Share = () => {
         </button>
       )}
       
-      <div className="flex flex-row justify-around items-center align-middle gap-75 my-10">
-        <p className="font-semibold">{numberToDot(initialMoney - normalMoney - manualMoney)}</p>
+      <div className="flex flex-row justify-around items-center align-middle gap-50 my-10">
+        <p className="font-semibold text-green-300 bg-black p-5 py-3 border rounded-xl">{numberToDot(initialMoney - normalMoney - manualMoney)}</p>
 
         {isEditingNormalMoney ? (
           <input
@@ -316,7 +316,7 @@ const Share = () => {
           />
         ) : (
           <button
-            className="font-semibold"
+            className="font-semibold text-red-300 bg-black p-5 py-3 border rounded-xl"
             onClick={handleNormalMoneyClick}
             title="Click to edit normal money"
           >
@@ -324,7 +324,7 @@ const Share = () => {
           </button>
         )}
 
-        <p className="">{numberToDot(manualMoney)}</p>
+        <p className="font-semibold text-yellow-200 bg-black p-5 py-3 border rounded-xl">{numberToDot(manualMoney)}</p>
       </div>
 
       <div className="flex flex-col gap-3 mb-5">
