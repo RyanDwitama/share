@@ -23,6 +23,7 @@ const Share = () => {
   const [editedName, setEditedName] = useState("");
   const [isEnteringName, setIsEnteringName] = useState(true);
   const nameSet = useMemo(() => new Set(data.map(p => p.name)), [data]);
+  const [selectedCategory, setSelectedCategory] = useState<"🟢" | "🔴" | null>(null);
 
   const [editingScoreIndex, setEditingScoreIndex] = useState<number | null>(null);
   const [editedScore, setEditedScore] = useState<number>(0);
@@ -38,6 +39,10 @@ const Share = () => {
 
   const numberToDot = (num: number): string => {
     return new Intl.NumberFormat("en-US").format(Math.floor(num));
+  };
+
+  const handleCategoryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSelectedCategory(e.target.value as "🟢" | "🔴");
   };
 
   const deletePersonData = (index: number) => {
@@ -140,9 +145,10 @@ const Share = () => {
   const addHandlerButton = () => {
     if (!currentName.trim() || nameSet.has(currentName)) return;
 
+    const category = currentScore === 0 ? "🟡" : selectedCategory || "🟡"; // Default to 🟡 if no radio selected
     const newPerson: PersonType = {
       name: currentName,
-      category: currentScore === 0 ? "🟡" : "🟢",
+      category: category,
       score: currentScore > 10000 ? 10000 : currentScore,
       estimate: 0,
     };
@@ -237,7 +243,9 @@ const Share = () => {
     updateTotalScoreAndEstimates(data);
   }, [initialMoney, normalMoney, manualMoney]);
 
-  
+  useEffect(() => {
+    setSelectedCategory("🟢"); // This will automatically check the 🟢 radio button
+  }, []);
 
   const saveEstimateEdit = (index: number): void => {
     const updatedData = [...data];
@@ -384,6 +392,29 @@ const Share = () => {
           />
         )}
 
+        <div className="flex flex-row justify-evenly">
+          <label>
+            <input
+              type="radio"
+              name="type"
+              value="🟢"
+              checked={selectedCategory === "🟢"}
+              onChange={handleCategoryChange}
+            />{" "}
+            🟢
+          </label>
+
+          <label>
+            <input
+              type="radio"
+              name="type"
+              value="🔴"
+              checked={selectedCategory === "🔴"}
+              onChange={handleCategoryChange}
+            />{" "}
+            🔴
+          </label>
+        </div>
 
         {isScoreInputVisible && (
           <input
