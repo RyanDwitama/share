@@ -145,7 +145,7 @@ const Share = () => {
   const addHandlerButton = () => {
     if (!currentName.trim() || nameSet.has(currentName)) return;
 
-    const category = currentScore === 0 ? "🟡" : selectedCategory || "🟡"; // Default to 🟡 if no radio selected
+    const category = currentScore === 0 ? "🟡" : selectedCategory || "🟡"; // Default to 🟡 if no radio selected.
     const newPerson: PersonType = {
       name: currentName,
       category: category,
