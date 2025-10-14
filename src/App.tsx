@@ -321,7 +321,7 @@ const Share = () => {
   }, [editingEstimateIndex]);
 
   useEffect(() => {
-    // Recalculate estimates after initial, normal, or manual money change.
+    // Recalculate estimates after initial, normal, or manual money change
     updateTotalScoreAndEstimates(data);
   }, [initialMoney, normalMoney, manualMoney]);
 
