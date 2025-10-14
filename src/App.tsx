@@ -16,13 +16,17 @@ const Share = () => {
   const [normalMoneyInput, setNormalMoneyInput] = useState(normalMoney);
   const [manualMoney, setManualMoney] = useState(0);
 
+  const customTrim = (input: string): string => {
+    return input.split(" ").filter(name => name).join(" ");
+  }
+  
   const [data, setData] = useState<PersonType[]>([]);
   const [currentName, setCurrentName] = useState("");
   const [currentScore, setCurrentScore] = useState(0);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [editedName, setEditedName] = useState("");
   const [isEnteringName, setIsEnteringName] = useState(true);
-  const nameSet = useMemo(() => new Set(data.map(p => p.name.trim().toLowerCase())), [data]);
+  const nameSet = useMemo(() => new Set(data.map(p => customTrim(p.name).toLowerCase())), [data]);
   const [selectedCategory, setSelectedCategory] = useState<"🟢" | "🔴" | null>(null);
 
   const [editingScoreIndex, setEditingScoreIndex] = useState<number | null>(null);
@@ -44,7 +48,7 @@ const Share = () => {
   const [filterName, setFilterName] = useState("");
 
   const filteredData = useMemo(() => {
-    const search = filterName.trim().toLowerCase();
+    const search = customTrim(filterName).toLowerCase();
     if (!search) return data;
 
     return data.filter(p =>p.name.toLowerCase().includes(search)); 
@@ -225,7 +229,7 @@ const Share = () => {
   };
 
   const addHandlerButton = () => {
-    let addName = currentName.split(" ").filter(name => name).join(" ");
+    const addName = customTrim(currentName);
     if (!addName || nameSet.has(addName.toLowerCase())) return;
 
     const category = currentScore === 0 ? "🟡" : selectedCategory || "🟡"; // Default to 🟡 if no radio selected.
@@ -257,9 +261,11 @@ const Share = () => {
   };
 
   const saveEditName = (index: number): void => {
+    const changeName = customTrim(editedName);
+
     if (
-      !editedName.trim() ||
-      data.some((p, i) => i !== index && p.name.toLowerCase().trim() === editedName.trim().toLowerCase())
+      !changeName ||
+      data.some((p, i) => i !== index && customTrim(p.name.toLowerCase()) === changeName.toLowerCase())
     ) {
       return;
     }
@@ -267,12 +273,12 @@ const Share = () => {
     const updatedData = [...data];
     const oldName = updatedData[index].name;
 
-    updatedData[index].name = editedName;
+    updatedData[index].name = changeName;
     updateTotalScoreAndEstimates(updatedData);
 
     const newNameSet = new Set(nameSet);
     newNameSet.delete(oldName);
-    newNameSet.add(editedName.toLowerCase().trim());
+    newNameSet.add(customTrim(changeName.toLowerCase()));
 
     setEditingIndex(null);
     setEditedName("");
@@ -434,7 +440,7 @@ const Share = () => {
               ref={inputRef}
               type="text"
               className={`border px-3 py-1 bg-[#1a1a1a] ${
-                currentName.trim() !== "" && nameSet.has(currentName.trim())
+                customTrim(currentName) !== "" && nameSet.has(customTrim(currentName))
                   ? "border-red-500"
                   : ""
               }`}
@@ -442,10 +448,11 @@ const Share = () => {
               value={currentName}
               onChange={(e) => setCurrentName(e.target.value)}
               onKeyDown={(e) => {
+                const testName = customTrim(currentName);
                 if (
                   e.key === "Enter" &&
-                  currentName.trim() &&
-                  !nameSet.has(currentName.trim().toLowerCase())
+                  testName &&
+                  !nameSet.has(testName.toLowerCase())
                 ) {
                   setIsEnteringName(false);
                   setTimeout(() => {
@@ -454,7 +461,7 @@ const Share = () => {
                 }
               }}
             />
-            {currentName.trim().toLowerCase() !== "" && nameSet.has(currentName.trim().toLowerCase()) && (
+            {currentName.split(" ").filter(name => name).join(" ").toLowerCase() !== "" && nameSet.has(currentName.split(" ").filter(name => name).join(" ").toLowerCase()) && (
               <span className="absolute left-full ml-2 top-1/2 -translate-y-1/2 text-red-600 text-sm whitespace-nowrap">
                 This name is already taken.
               </span>
@@ -586,9 +593,9 @@ const Share = () => {
                         ref={inputRef}
                         type="text"
                         className={`border px-1 py-1 ${
-                          editedName.trim() !== "" &&
+                          customTrim(editedName) !== "" &&
                           data.some(
-                            (p, i) => i !== index && p.name.toLowerCase() === editedName.trim().toLowerCase()
+                            (p, i) => i !== index && p.name.toLowerCase() === customTrim(editedName).toLowerCase()
                           )
                             ? "border-red-500"
                             : ""
@@ -603,9 +610,9 @@ const Share = () => {
                           }
                         }}
                       />
-                      {editedName.trim() !== "" &&
+                      {customTrim(editedName) !== "" &&
                         data.some(
-                          (p, i) => i !== index && p.name.toLowerCase() === editedName.trim().toLowerCase()
+                          (p, i) => i !== index && p.name.toLowerCase() === customTrim(editedName).toLowerCase()
                         ) && (
                           <span className="absolute left-0 ml-2 text-red-600 text-sm whitespace-nowrap">
                             Name is taken.
@@ -615,9 +622,9 @@ const Share = () => {
                         onClick={() => saveEditName(index)}
                         className="bg-black text-white px-2 rounded"
                         disabled={
-                          editedName.trim() === "" ||
+                          customTrim(editedName) === "" ||
                           data.some(
-                            (p, i) => i !== index && p.name.toLowerCase() === editedName.trim().toLowerCase()
+                            (p, i) => i !== index && p.name.toLowerCase() === customTrim(editedName).toLowerCase()
                           )
                         }
                       >
