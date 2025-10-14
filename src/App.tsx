@@ -144,8 +144,8 @@ const Share = () => {
   };
 
   const handleNormalMoneyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  setNormalMoneyInput(Number(e.target.value)); // Update normalMoneyInput
-};
+    setNormalMoneyInput(Number(e.target.value)); // Update normalMoneyInput
+  };
 
 
   const saveNormalMoney = () => {
@@ -705,7 +705,7 @@ const Share = () => {
         </table>
       </div>
     </div>
-    </div>
+  </div>
   );
 };
 
