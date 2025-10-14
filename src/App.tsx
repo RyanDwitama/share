@@ -127,7 +127,7 @@ const Share = () => {
     const personToDelete = filteredData[index];
     if (!personToDelete) return;
 
-    // Remove from full data list by matching name
+    // Remove from full data list by matching name.
     const updatedData = data.filter(p => p.name !== personToDelete.name);
 
     // Adjust manual money if needed
