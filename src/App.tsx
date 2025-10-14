@@ -221,7 +221,7 @@ const Share = () => {
       };
     });
 
-    setData(updatedData); // ✅ single place we set the state
+    setData(updatedData); // ✅ single place we set the state 
   };
 
   const addHandlerButton = () => {
