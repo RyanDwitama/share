@@ -22,7 +22,7 @@ const Share = () => {
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [editedName, setEditedName] = useState("");
   const [isEnteringName, setIsEnteringName] = useState(true);
-  const nameSet = useMemo(() => new Set(data.map(p => p.name)), [data]);
+  const nameSet = useMemo(() => new Set(data.map(p => p.name.toLowerCase())), [data]);
   const [selectedCategory, setSelectedCategory] = useState<"🟢" | "🔴" | null>(null);
 
   const [editingScoreIndex, setEditingScoreIndex] = useState<number | null>(null);
