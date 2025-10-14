@@ -228,7 +228,6 @@ const Share = () => {
     let addName = currentName.split(" ").filter(name => name).join(" ");
     if (!addName || nameSet.has(addName.toLowerCase())) return;
 
-    console.log(addName);
     const category = currentScore === 0 ? "🟡" : selectedCategory || "🟡"; // Default to 🟡 if no radio selected.
     const newPerson: PersonType = {
       name: addName,
