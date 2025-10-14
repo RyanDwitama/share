@@ -22,7 +22,7 @@ const Share = () => {
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [editedName, setEditedName] = useState("");
   const [isEnteringName, setIsEnteringName] = useState(true);
-  const nameSet = useMemo(() => new Set(data.map(p => p.name.toLowerCase())), [data]);
+  const nameSet = useMemo(() => new Set(data.map(p => p.name.trim().toLowerCase())), [data]);
   const [selectedCategory, setSelectedCategory] = useState<"🟢" | "🔴" | null>(null);
 
   const [editingScoreIndex, setEditingScoreIndex] = useState<number | null>(null);
@@ -225,7 +225,7 @@ const Share = () => {
   };
 
   const addHandlerButton = () => {
-    if (!currentName.trim() || nameSet.has(currentName.toLowerCase())) return;
+    if (!currentName.trim() || nameSet.has(currentName.toLowerCase().trim())) return;
 
     const category = currentScore === 0 ? "🟡" : selectedCategory || "🟡"; // Default to 🟡 if no radio selected.
     const newPerson: PersonType = {
@@ -239,7 +239,7 @@ const Share = () => {
     updateTotalScoreAndEstimates(updatedData);
 
     const newNameSet = new Set(nameSet);
-    newNameSet.add(currentName.toLowerCase());
+    newNameSet.add(currentName.toLowerCase().trim());
 
     setCurrentName("");
     setCurrentScore(0);
@@ -258,7 +258,7 @@ const Share = () => {
   const saveEditName = (index: number): void => {
     if (
       !editedName.trim() ||
-      data.some((p, i) => i !== index && p.name.toLowerCase() === editedName.trim().toLowerCase())
+      data.some((p, i) => i !== index && p.name.toLowerCase().trim() === editedName.trim().toLowerCase())
     ) {
       return;
     }
@@ -271,7 +271,7 @@ const Share = () => {
 
     const newNameSet = new Set(nameSet);
     newNameSet.delete(oldName);
-    newNameSet.add(editedName.toLowerCase());
+    newNameSet.add(editedName.toLowerCase().trim());
 
     setEditingIndex(null);
     setEditedName("");
