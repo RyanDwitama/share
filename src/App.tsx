@@ -37,6 +37,11 @@ const Share = () => {
   const scoreInputRef = useRef<HTMLInputElement | null>(null);
   const estimateInputRef = useRef<HTMLInputElement | null>(null);
 
+  const [lastSortName, setLastSortName] = useState(false);
+  const [lastSortCategory, setLastSortCategory] = useState(false);
+  const [lastSortScore, setLastSortScore] = useState(false);
+  const [lastSortEstimate, setLastSortEstimate] = useState(false);
+
   const numberToDot = (num: number): string => {
     return new Intl.NumberFormat("en-US").format(Math.floor(num));
   };
@@ -44,6 +49,71 @@ const Share = () => {
   const handleCategoryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSelectedCategory(e.target.value as "🟢" | "🔴");
   };
+
+  const sortName = (): void => {
+    const updatedData = [...data];
+
+    if (!lastSortName) {
+      updatedData.sort((a, b) => a.name.localeCompare(b.name));
+    } else {
+      updatedData.sort((a, b) => b.name.localeCompare(a.name));
+    }
+    
+    setData(updatedData);
+    setLastSortName(!lastSortName);
+    setLastSortCategory(false);
+    setLastSortScore(false);
+    setLastSortEstimate(false);
+
+  }
+
+  const sortCategory = (): void => {
+    const updatedData = [...data];
+
+    if (!lastSortCategory) {
+      updatedData.sort((a, b) => a.category.localeCompare(b.category));
+    } else {
+      updatedData.sort((a, b) => b.category.localeCompare(a.category));
+    }
+    
+    setData(updatedData);
+    setLastSortName(false);
+    setLastSortCategory(!lastSortCategory);
+    setLastSortScore(false);
+    setLastSortEstimate(false);
+  }
+
+  const sortScore = (): void => {
+    const updatedData = [...data];
+
+    if (!lastSortScore) {
+      updatedData.sort((a, b) => a.score - b.score);
+    } else {
+      updatedData.sort((a, b) => b.score - a.score);
+    }
+    
+    setData(updatedData);
+    setLastSortName(false);
+    setLastSortCategory(false);
+    setLastSortScore(!lastSortScore);
+    setLastSortEstimate(false);
+  }
+
+  const sortEstimate = (): void => {
+    const updatedData = [...data];
+
+    if (!lastSortEstimate) {
+      updatedData.sort((a, b) => a.estimate - b.estimate);
+    } else {
+      updatedData.sort((a, b) => b.estimate - a.estimate);
+    }
+    
+    setData(updatedData);
+    setLastSortName(false);
+    setLastSortCategory(false);
+    setLastSortScore(false);
+    setLastSortEstimate(!lastSortEstimate);
+  }
 
   const deletePersonData = (index: number) => {
     const personToDelete = data[index];
@@ -437,10 +507,38 @@ const Share = () => {
           <thead>
             <tr className="!bg-[#1a1a1a] text-left">
               <th>No</th>
-              <th className="min-w-[350px]">Name</th>
-              <th>Status</th>
-              <th>Score</th>
-              <th className="min-w-[180px]">Estimate</th>
+              <th className="min-w-[350px]">
+                <button
+                  className="hover:text-red-900 hover:scale-105"
+                  onClick={() => sortName()}
+                >
+                  Name
+                </button>
+              </th>
+              <th>
+                <button
+                  className="hover:text-red-900 hover:scale-105"
+                  onClick={() => sortCategory()}
+                >
+                  Status
+                </button>
+              </th>
+              <th>
+                <button
+                  className="hover:text-red-900 hover:scale-105"
+                  onClick={() => sortScore()}
+                >
+                  Score
+                </button>
+              </th>
+              <th className="min-w-[180px]">
+                <button
+                  className="hover:text-red-900 hover:scale-105"
+                  onClick={() => sortEstimate()}
+                >
+                  Estimate
+                </button>
+              </th>
             </tr>
           </thead>
           <tbody>

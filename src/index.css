@@ -1,5 +1,11 @@
 @import "tailwindcss";
 
+@layer components {
+  .hover {
+    @apply hover:text-red-800 hover:scale-105
+  }
+}
+
 td, th {
     border: 2px solid rgb(160, 160, 160);
     text-align: left;
