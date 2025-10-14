@@ -239,7 +239,7 @@ const Share = () => {
     updateTotalScoreAndEstimates(updatedData);
 
     const newNameSet = new Set(nameSet);
-    newNameSet.add(currentName);
+    newNameSet.add(currentName.toLowerCase());
 
     setCurrentName("");
     setCurrentScore(0);
@@ -266,7 +266,7 @@ const Share = () => {
 
     const newNameSet = new Set(nameSet);
     newNameSet.delete(oldName);
-    newNameSet.add(editedName);
+    newNameSet.add(editedName.toLowerCase());
 
     setEditingIndex(null);
     setEditedName("");
@@ -448,7 +448,7 @@ const Share = () => {
                 }
               }}
             />
-            {currentName.trim() !== "" && nameSet.has(currentName.trim()) && (
+            {currentName.trim().toLowerCase() !== "" && nameSet.has(currentName.trim().toLowerCase()) && (
               <span className="absolute left-full ml-2 top-1/2 -translate-y-1/2 text-red-600 text-sm whitespace-nowrap">
                 This name is already taken.
               </span>
@@ -592,7 +592,7 @@ const Share = () => {
                         }}
                       />
                       {editedName.trim() !== "" &&
-                        data.some((p, i) => i !== index && p.name === editedName.trim()) && (
+                        data.some((p, i) => i !== index && p.name === editedName.trim().toLowerCase()) && (
                           <span className="absolute left-0 ml-2 text-red-600 text-sm whitespace-nowrap">
                             Name is taken.
                           </span>
