@@ -256,7 +256,12 @@ const Share = () => {
   };
 
   const saveEditName = (index: number): void => {
-    if (!editedName.trim() || nameSet.has(editedName)) return;
+    if (
+      !editedName.trim() ||
+      data.some((p, i) => i !== index && p.name.toLowerCase() === editedName.trim().toLowerCase())
+    ) {
+      return;
+    }
 
     const updatedData = [...data];
     const oldName = updatedData[index].name;
@@ -581,7 +586,9 @@ const Share = () => {
                         type="text"
                         className={`border px-1 py-1 ${
                           editedName.trim() !== "" &&
-                          data.some((p, i) => i !== index && p.name === editedName.trim())
+                          data.some(
+                            (p, i) => i !== index && p.name.toLowerCase() === editedName.trim().toLowerCase()
+                          )
                             ? "border-red-500"
                             : ""
                         }`}
@@ -589,10 +596,16 @@ const Share = () => {
                         onChange={(e) => setEditedName(e.target.value)}
                         onKeyDown={(e) => {
                           if (e.key === "Enter") saveEditName(index);
+                          else if (e.key === "Escape") {
+                            setEditingIndex(null);
+                            setEditedName("");
+                          }
                         }}
                       />
                       {editedName.trim() !== "" &&
-                        data.some((p, i) => i !== index && p.name === editedName.trim().toLowerCase()) && (
+                        data.some(
+                          (p, i) => i !== index && p.name.toLowerCase() === editedName.trim().toLowerCase()
+                        ) && (
                           <span className="absolute left-0 ml-2 text-red-600 text-sm whitespace-nowrap">
                             Name is taken.
                           </span>
@@ -602,7 +615,9 @@ const Share = () => {
                         className="bg-black text-white px-2 rounded"
                         disabled={
                           editedName.trim() === "" ||
-                          data.some((p, i) => i !== index && p.name === editedName.trim())
+                          data.some(
+                            (p, i) => i !== index && p.name.toLowerCase() === editedName.trim().toLowerCase()
+                          )
                         }
                       >
                         Save
