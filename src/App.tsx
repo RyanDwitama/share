@@ -151,9 +151,10 @@ const Share = () => {
     setNormalMoneyInput(Number(e.target.value)); // Update normalMoneyInput
   };
 
-
   const saveNormalMoney = () => {
-    if (normalMoneyInput < 0 || normalMoneyInput > initialMoney) {
+    const limit = initialMoney - manualMoney;
+
+    if (normalMoneyInput < 0 || normalMoneyInput > limit) {
       setNormalMoneyInput(normalMoney);  // Revert if out of bounds
     } else {
       setNormalMoney(normalMoneyInput);  // Update the state with new value
