@@ -366,7 +366,7 @@ const Share = () => {
     if (newManualMoney <= initialMoney) {
       setManualMoney(newManualMoney);
     } else {
-      setManualMoney(manualMoney); // Don't allow manual money to exceed initial money.
+      setManualMoney(manualMoney); // Don't allow manual money to exceed initial money
     }
 
     setEditingEstimateIndex(null);
