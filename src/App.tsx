@@ -157,7 +157,7 @@ const Share = () => {
     if (normalMoneyInput < 0 || normalMoneyInput > limit) {
       setNormalMoneyInput(normalMoney);  // Revert if out of bounds
     } else {
-      setNormalMoney(normalMoneyInput);  // Update the state with new value
+      setNormalMoney(normalMoneyInput);  // Update the state with new value 
     }
     setIsEditingNormalMoney(false);
   };
