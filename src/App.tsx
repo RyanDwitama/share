@@ -343,7 +343,8 @@ const Share = () => {
 
   const saveEstimateEdit = (index: number): void => {
     const updatedData = [...data];
-    const limit = initialMoney - normalMoney - manualMoney;    
+    const prevMoney = updatedData[index].category === "🟡" ? updatedData[index].estimate : 0;
+    const limit = initialMoney - normalMoney - manualMoney + prevMoney;
 
     // Ensure valid estimate input
     const validEstimate = isNaN(editedEstimate) || editedEstimate <= 0 ? 0 : editedEstimate > limit ? limit : editedEstimate;
