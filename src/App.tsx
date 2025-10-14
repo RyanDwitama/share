@@ -186,7 +186,7 @@ const Share = () => {
 
   const saveInitialMoney = () => {
     if (!initialMoneyInput || initialMoneyInput <= 0) {
-      setInitialMoneyInput(initialMoney);  // If invalid input, revert to original 
+      setInitialMoneyInput(initialMoney);  // If invalid input, revert to original
     } else {
       setInitialMoney(initialMoneyInput);  // Save the edited value to the `initialMoney` state
     }
