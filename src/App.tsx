@@ -41,6 +41,14 @@ const Share = () => {
   const [lastSortCategory, setLastSortCategory] = useState(false);
   const [lastSortScore, setLastSortScore] = useState(false);
   const [lastSortEstimate, setLastSortEstimate] = useState(false);
+  const [filterName, setFilterName] = useState("");
+
+  const filteredData = useMemo(() => {
+    const search = filterName.trim().toLowerCase();
+    if (!search) return data;
+
+    return data.filter(p =>p.name.toLowerCase().includes(search)); 
+  }, [filterName, data]);
 
   const numberToDot = (num: number): string => {
     return new Intl.NumberFormat("en-US").format(Math.floor(num));
@@ -71,9 +79,9 @@ const Share = () => {
     const updatedData = [...data];
 
     if (!lastSortCategory) {
-      updatedData.sort((a, b) => a.category.localeCompare(b.category));
-    } else {
       updatedData.sort((a, b) => b.category.localeCompare(a.category));
+    } else {
+      updatedData.sort((a, b) => a.category.localeCompare(b.category));
     }
     
     setData(updatedData);
@@ -87,9 +95,9 @@ const Share = () => {
     const updatedData = [...data];
 
     if (!lastSortScore) {
-      updatedData.sort((a, b) => a.score - b.score);
-    } else {
       updatedData.sort((a, b) => b.score - a.score);
+    } else {
+      updatedData.sort((a, b) => a.score - b.score);
     }
     
     setData(updatedData);
@@ -103,9 +111,9 @@ const Share = () => {
     const updatedData = [...data];
 
     if (!lastSortEstimate) {
-      updatedData.sort((a, b) => a.estimate - b.estimate);
-    } else {
       updatedData.sort((a, b) => b.estimate - a.estimate);
+    } else {
+      updatedData.sort((a, b) => a.estimate - b.estimate);
     }
     
     setData(updatedData);
@@ -116,14 +124,18 @@ const Share = () => {
   }
 
   const deletePersonData = (index: number) => {
-    const personToDelete = data[index];
-    const updatedData = data.filter((_, i) => i !== index);
+    const personToDelete = filteredData[index];
+    if (!personToDelete) return;
 
+    // Remove from full data list by matching name
+    const updatedData = data.filter(p => p.name !== personToDelete.name);
+
+    // Adjust manual money if needed
     if (personToDelete.category === "🟡") {
       setManualMoney(prev => prev - personToDelete.estimate);
     }
 
-    updateTotalScoreAndEstimates(updatedData); // This sets the new data and recalculates
+    updateTotalScoreAndEstimates(updatedData);
   };
 
   const handleNormalMoneyClick = () => {
@@ -502,6 +514,14 @@ const Share = () => {
         )}
       </div>
 
+      <input 
+        type="text"
+        placeholder="Search name..."
+        className="border w-256 mb-5 px-5 py-2"
+        value={filterName}
+        onChange={e => setFilterName(e.target.value)}
+      />
+
       <div className="border-2 bg-black w-full max-w-5xl overflow-auto">
         <table className="w-full table-auto border-collapse">
           <thead>
@@ -542,7 +562,7 @@ const Share = () => {
             </tr>
           </thead>
           <tbody>
-            {data.map((person, index) => (
+            {filteredData.map((person, index) => (
               <tr key={index} className="border-t">
                 <td>
                   <button 
