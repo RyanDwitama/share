@@ -225,7 +225,7 @@ const Share = () => {
   };
 
   const addHandlerButton = () => {
-    if (!currentName.trim() || nameSet.has(currentName)) return;
+    if (!currentName.trim() || nameSet.has(currentName.toLowerCase())) return;
 
     const category = currentScore === 0 ? "🟡" : selectedCategory || "🟡"; // Default to 🟡 if no radio selected.
     const newPerson: PersonType = {
@@ -439,7 +439,7 @@ const Share = () => {
                 if (
                   e.key === "Enter" &&
                   currentName.trim() &&
-                  !nameSet.has(currentName.trim())
+                  !nameSet.has(currentName.trim().toLowerCase())
                 ) {
                   setIsEnteringName(false);
                   setTimeout(() => {
