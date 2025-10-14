@@ -152,13 +152,11 @@ const Share = () => {
   };
 
   const saveNormalMoney = () => {
-    const limit = initialMoney - manualMoney;
+    const maxLimit = initialMoney - manualMoney;
+    const calculatedNormalMoney = normalMoneyInput > maxLimit ? maxLimit : normalMoneyInput < 0 ? 0 : normalMoneyInput
 
-    if (normalMoneyInput < 0 || normalMoneyInput > limit) {
-      setNormalMoneyInput(normalMoney);  // Revert if out of bounds
-    } else {
-      setNormalMoney(normalMoneyInput);  // Update the state with new value 
-    }
+    setNormalMoney(calculatedNormalMoney);
+    setNormalMoneyInput(calculatedNormalMoney);
     setIsEditingNormalMoney(false);
   };
 
