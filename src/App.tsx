@@ -231,11 +231,11 @@ const Share = () => {
     const addName = customTrim(currentName);
     if (!addName || nameSet.has(addName.toLowerCase())) return;
 
-    const category = currentScore === 0 ? "🟡" : selectedCategory || "🟡"; // Default to 🟡 if no radio selected.
+    const category = currentScore <= 0 ? "🟡" : selectedCategory || "🟡"; // Default to 🟡 if no radio selected.
     const newPerson: PersonType = {
       name: addName,
       category: category,
-      score: currentScore > 10000 ? 10000 : currentScore,
+      score: currentScore > 10000 ? 10000 : currentScore < 0 ? 0 : currentScore,
       estimate: 0,
     };
 
@@ -291,7 +291,6 @@ const Share = () => {
       updatedData[index].category = "🟢";
     } else {
       updatedData[index].category = "🟢";
-      updatedData[index].score = 1;
       setManualMoney(manualMoney - updatedData[index].estimate);
     }
     updateTotalScoreAndEstimates(updatedData);
@@ -306,8 +305,12 @@ const Share = () => {
 
   const saveScoreEdit = (index: number): void => {
     const updatedData = [...data];
-    const newMax = Math.min(editedScore, 10000);
+    const newMax = Math.min(Math.max(editedScore, 0), 10000);
     updatedData[index].score = newMax;
+
+    if (updatedData[index].score === 0) {
+      updatedData[index].estimate = 0;
+    }
 
     updateTotalScoreAndEstimates(updatedData);
     setEditingScoreIndex(null);
