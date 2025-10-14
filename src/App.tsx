@@ -225,11 +225,13 @@ const Share = () => {
   };
 
   const addHandlerButton = () => {
-    if (!currentName.trim() || nameSet.has(currentName.toLowerCase().trim())) return;
+    let addName = currentName.split(" ").filter(name => name).join(" ");
+    if (!addName || nameSet.has(addName.toLowerCase())) return;
 
+    console.log(addName);
     const category = currentScore === 0 ? "🟡" : selectedCategory || "🟡"; // Default to 🟡 if no radio selected.
     const newPerson: PersonType = {
-      name: currentName,
+      name: addName,
       category: category,
       score: currentScore > 10000 ? 10000 : currentScore,
       estimate: 0,
@@ -239,7 +241,7 @@ const Share = () => {
     updateTotalScoreAndEstimates(updatedData);
 
     const newNameSet = new Set(nameSet);
-    newNameSet.add(currentName.toLowerCase().trim());
+    newNameSet.add(addName.toLowerCase());
 
     setCurrentName("");
     setCurrentScore(0);
