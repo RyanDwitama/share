@@ -343,9 +343,10 @@ const Share = () => {
 
   const saveEstimateEdit = (index: number): void => {
     const updatedData = [...data];
+    const limit = initialMoney - normalMoney - manualMoney;    
 
     // Ensure valid estimate input
-    const validEstimate = isNaN(editedEstimate) || editedEstimate <= 0 ? 0 : editedEstimate;
+    const validEstimate = isNaN(editedEstimate) || editedEstimate <= 0 ? 0 : editedEstimate > limit ? limit : editedEstimate;
 
     // Save the initial value
     let lastEstimate = 0;
@@ -354,13 +355,10 @@ const Share = () => {
       lastEstimate = updatedData[index].estimate;
     }
 
-    // Manually update the person's estimate
     updatedData[index].estimate = validEstimate;
 
-    // Reset the score to 0 when editing the estimate
     updatedData[index].score = 0;
 
-    // Change the category to neutral (🟡) when manually editing estimate
     updatedData[index].category = "🟡"; // Neutral category
 
     // Update manual money, ensuring it doesn't exceed the initial money
