@@ -527,6 +527,14 @@ const Share = () => {
           />
         )}
       </div>
+      
+      <div className="relative mr-[991px]">
+        <div className="absolute left-[-25px] bottom-0">
+          <button className="text-[50px]">
+            ⚙️
+          </button>
+        </div>
+      </div>
 
       <input 
         type="text"
